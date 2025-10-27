@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import { Home, Info, BookOpen, Award, PenSquare } from "lucide-react";
+import { Home, BookOpen, Award, PenSquare } from "lucide-react";
 
 const SideNav = () => {
   const location = useLocation();
@@ -20,18 +20,6 @@ const SideNav = () => {
           title="Home"
         >
           <Home className="h-5 w-5" />
-        </Link>
-        
-        <Link
-          to="/about"
-          className={`p-3 rounded-lg transition-all flex items-center justify-center group ${
-            isActive("/about")
-              ? "bg-accent text-accent-foreground shadow-sm"
-              : "hover:bg-muted text-muted-foreground hover:text-foreground"
-          }`}
-          title="About"
-        >
-          <Info className="h-5 w-5" />
         </Link>
         
         <Link

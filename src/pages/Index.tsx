@@ -1,17 +1,35 @@
+import { useEffect, useState } from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import BlogCard from "@/components/BlogCard";
 import SideNav from "@/components/SideNav";
-import GallerySlideshow from "@/components/GallerySlideshow";
+import GallerySectionCard from "@/components/GallerySectionCard";
 import { Button } from "@/components/ui/button";
 import { BookOpen, Sparkles, Award, Users, Microscope } from "lucide-react";
 import heroBanner from "@/assets/hero-banner.jpg";
 import collegeBuilding from "@/assets/college-building.jpg";
-
-// Blog posts will be added by authorized users
-const blogPosts: any[] = [];
+import { getBlogPosts, getGallerySections, addImageToSection, removeImageFromSection, GallerySection } from "@/utils/storage";
+import type { BlogPost } from "@/utils/storage";
 
 const Index = () => {
+  const [blogPosts, setBlogPosts] = useState<BlogPost[]>([]);
+  const [gallerySections, setGallerySections] = useState<GallerySection[]>([]);
+
+  useEffect(() => {
+    setBlogPosts(getBlogPosts());
+    setGallerySections(getGallerySections());
+  }, []);
+
+  const handleImageAdd = (sectionId: string, image: { src: string; alt: string; caption: string }) => {
+    addImageToSection(sectionId, image);
+    setGallerySections(getGallerySections());
+  };
+
+  const handleImageRemove = (sectionId: string, imageIndex: number) => {
+    removeImageFromSection(sectionId, imageIndex);
+    setGallerySections(getGallerySections());
+  };
+
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <Navbar />
@@ -60,11 +78,19 @@ const Index = () => {
             </p>
           </div>
           
-          <div className="grid md:grid-cols-2 lg:grid-cols-2 gap-8">
-            {blogPosts.map((post) => (
-              <BlogCard key={post.id} {...post} />
-            ))}
-          </div>
+          {blogPosts.length > 0 ? (
+            <div className="grid md:grid-cols-2 lg:grid-cols-2 gap-8">
+              {blogPosts.map((post) => (
+                <BlogCard key={post.id} {...post} />
+              ))}
+            </div>
+          ) : (
+            <div className="bg-muted/30 rounded-xl p-12 text-center">
+              <p className="text-muted-foreground text-lg">
+                No blog posts yet. Create your first post using the Write Post button in the navigation.
+              </p>
+            </div>
+          )}
         </div>
       </section>
 
@@ -124,18 +150,29 @@ const Index = () => {
       </section>
 
       {/* Photo Gallery Section */}
-      <section className="py-16">
+      <section className="py-16 bg-muted/20">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="font-serif text-3xl md:text-4xl font-bold text-foreground mb-4">
               Campus Gallery
             </h2>
             <p className="text-muted-foreground max-w-2xl mx-auto">
-              Upload your campus images to showcase state-of-the-art facilities and vibrant campus life
+              Explore our state-of-the-art facilities, vibrant campus life, and memorable moments through these galleries
             </p>
           </div>
           
-          <GallerySlideshow images={[]} />
+          <div className="space-y-8">
+            {gallerySections.map((section) => (
+              <GallerySectionCard
+                key={section.id}
+                sectionId={section.id}
+                sectionName={section.name}
+                images={section.images}
+                onImageAdd={handleImageAdd}
+                onImageRemove={handleImageRemove}
+              />
+            ))}
+          </div>
         </div>
       </section>
 

@@ -8,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { ImagePlus, X } from "lucide-react";
+import { saveBlogPost } from "@/utils/storage";
 
 const NewPost = () => {
   const navigate = useNavigate();
@@ -33,6 +34,23 @@ const NewPost = () => {
       return;
     }
 
+    // Create excerpt from content (first 150 characters)
+    const excerpt = formData.content.substring(0, 150) + (formData.content.length > 150 ? "..." : "");
+
+    // Save blog post
+    const blogPost = {
+      id: Date.now().toString(),
+      title: formData.title,
+      excerpt,
+      author: formData.author,
+      date: new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }),
+      category: formData.category,
+      image: coverImage,
+      content: formData.content,
+      galleryImages: galleryImages
+    };
+
+    saveBlogPost(blogPost);
     toast.success("Post published successfully!");
     navigate("/");
   };
