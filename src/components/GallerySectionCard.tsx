@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Plus, X } from "lucide-react";
+import { Plus, X, Pencil, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -17,6 +17,7 @@ interface GallerySectionCardProps {
   }>;
   onImageAdd: (sectionId: string, image: { src: string; alt: string; caption: string }) => void;
   onImageRemove: (sectionId: string, imageIndex: number) => void;
+  onNameEdit: (sectionId: string, newName: string) => void;
 }
 
 const GallerySectionCard = ({ 
@@ -24,12 +25,23 @@ const GallerySectionCard = ({
   sectionName, 
   images, 
   onImageAdd,
-  onImageRemove 
+  onImageRemove,
+  onNameEdit
 }: GallerySectionCardProps) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [imageFile, setImageFile] = useState<string | null>(null);
   const [caption, setCaption] = useState("");
   const [altText, setAltText] = useState("");
+  const [isEditingName, setIsEditingName] = useState(false);
+  const [editedName, setEditedName] = useState(sectionName);
+
+  const handleNameSave = () => {
+    if (editedName.trim() && editedName !== sectionName) {
+      onNameEdit(sectionId, editedName.trim());
+      toast.success("Section name updated!");
+    }
+    setIsEditingName(false);
+  };
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -65,7 +77,35 @@ const GallerySectionCard = ({
     <div className="bg-card rounded-xl border shadow-lg overflow-hidden">
       {/* Section Header */}
       <div className="bg-gradient-to-r from-accent/10 to-primary/10 p-6 border-b flex items-center justify-between">
-        <h3 className="font-serif text-2xl font-bold text-foreground">{sectionName}</h3>
+        <div className="flex items-center gap-3">
+          {isEditingName ? (
+            <div className="flex items-center gap-2">
+              <Input
+                value={editedName}
+                onChange={(e) => setEditedName(e.target.value)}
+                className="font-serif text-2xl font-bold h-auto py-1"
+                onKeyDown={(e) => e.key === 'Enter' && handleNameSave()}
+              />
+              <Button size="sm" variant="ghost" onClick={handleNameSave}>
+                <Check className="h-4 w-4" />
+              </Button>
+            </div>
+          ) : (
+            <>
+              <h3 className="font-serif text-2xl font-bold text-foreground">{sectionName}</h3>
+              <Button 
+                size="sm" 
+                variant="ghost" 
+                onClick={() => {
+                  setIsEditingName(true);
+                  setEditedName(sectionName);
+                }}
+              >
+                <Pencil className="h-4 w-4" />
+              </Button>
+            </>
+          )}
+        </div>
         
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>

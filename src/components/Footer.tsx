@@ -54,6 +54,9 @@ const Footer = () => {
           <p className="text-primary-foreground/60 text-xs mt-2">
             An Autonomous Institution | AICTE Approved | ISO 9001:2015 Certified
           </p>
+          <p className="text-primary-foreground/50 text-xs mt-3 font-medium">
+            Website developed by TANISH B.E.EIE (2nd year)
+          </p>
         </div>
       </div>
     </footer>

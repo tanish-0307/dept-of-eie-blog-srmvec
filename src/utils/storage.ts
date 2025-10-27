@@ -22,8 +22,17 @@ export interface GallerySection {
   }>;
 }
 
+export interface Achievement {
+  id: string;
+  studentName: string;
+  achievement: string;
+  date: string;
+  image?: string;
+}
+
 const BLOG_POSTS_KEY = 'eie_blog_posts';
 const GALLERY_SECTIONS_KEY = 'eie_gallery_sections';
+const ACHIEVEMENTS_KEY = 'eie_achievements';
 
 // Blog Post Functions
 export const saveBlogPost = (post: BlogPost): void => {
@@ -79,4 +88,31 @@ export const removeImageFromSection = (sectionId: string, imageIndex: number): v
     section.images.splice(imageIndex, 1);
     saveGallerySections(sections);
   }
+};
+
+export const updateSectionName = (sectionId: string, newName: string): void => {
+  const sections = getGallerySections();
+  const section = sections.find(s => s.id === sectionId);
+  if (section) {
+    section.name = newName;
+    saveGallerySections(sections);
+  }
+};
+
+// Achievement Functions
+export const saveAchievement = (achievement: Achievement): void => {
+  const achievements = getAchievements();
+  achievements.unshift(achievement);
+  localStorage.setItem(ACHIEVEMENTS_KEY, JSON.stringify(achievements));
+};
+
+export const getAchievements = (): Achievement[] => {
+  const achievements = localStorage.getItem(ACHIEVEMENTS_KEY);
+  return achievements ? JSON.parse(achievements) : [];
+};
+
+export const deleteAchievement = (id: string): void => {
+  const achievements = getAchievements();
+  const filtered = achievements.filter(achievement => achievement.id !== id);
+  localStorage.setItem(ACHIEVEMENTS_KEY, JSON.stringify(filtered));
 };

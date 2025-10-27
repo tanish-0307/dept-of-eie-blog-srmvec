@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { BookOpen, Sparkles, Award, Users, Microscope } from "lucide-react";
 import heroBanner from "@/assets/hero-banner.jpg";
 import collegeBuilding from "@/assets/college-building.jpg";
-import { getBlogPosts, getGallerySections, addImageToSection, removeImageFromSection, GallerySection } from "@/utils/storage";
+import { getBlogPosts, getGallerySections, addImageToSection, removeImageFromSection, updateSectionName, GallerySection } from "@/utils/storage";
 import type { BlogPost } from "@/utils/storage";
 
 const Index = () => {
@@ -27,6 +27,11 @@ const Index = () => {
 
   const handleImageRemove = (sectionId: string, imageIndex: number) => {
     removeImageFromSection(sectionId, imageIndex);
+    setGallerySections(getGallerySections());
+  };
+
+  const handleNameEdit = (sectionId: string, newName: string) => {
+    updateSectionName(sectionId, newName);
     setGallerySections(getGallerySections());
   };
 
@@ -170,6 +175,7 @@ const Index = () => {
                 images={section.images}
                 onImageAdd={handleImageAdd}
                 onImageRemove={handleImageRemove}
+                onNameEdit={handleNameEdit}
               />
             ))}
           </div>

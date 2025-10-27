@@ -7,8 +7,8 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { ImagePlus, X } from "lucide-react";
-import { saveBlogPost } from "@/utils/storage";
+import { ImagePlus, X, Award } from "lucide-react";
+import { saveBlogPost, saveAchievement } from "@/utils/storage";
 
 const NewPost = () => {
   const navigate = useNavigate();
@@ -20,6 +20,11 @@ const NewPost = () => {
   });
   const [coverImage, setCoverImage] = useState<string | null>(null);
   const [galleryImages, setGalleryImages] = useState<string[]>([]);
+  const [achievementData, setAchievementData] = useState({
+    studentName: "",
+    achievement: "",
+  });
+  const [achievementImage, setAchievementImage] = useState<string | null>(null);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -92,6 +97,46 @@ const NewPost = () => {
       ...formData,
       [e.target.name]: e.target.value,
     });
+  };
+
+  const handleAchievementChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    setAchievementData({
+      ...achievementData,
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  const handleAchievementImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setAchievementImage(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleAchievementSubmit = () => {
+    if (!achievementData.studentName || !achievementData.achievement) {
+      toast.error("Please fill in all achievement fields");
+      return;
+    }
+
+    const achievement = {
+      id: Date.now().toString(),
+      studentName: achievementData.studentName,
+      achievement: achievementData.achievement,
+      date: new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }),
+      image: achievementImage || undefined,
+    };
+
+    saveAchievement(achievement);
+    toast.success("Achievement added successfully!");
+    
+    // Reset form
+    setAchievementData({ studentName: "", achievement: "" });
+    setAchievementImage(null);
   };
 
   return (
@@ -268,6 +313,97 @@ const NewPost = () => {
               </Button>
             </div>
           </form>
+
+          {/* Student Achievements Section */}
+          <div className="mt-12 bg-card p-8 rounded-xl shadow-[var(--shadow-card)] border">
+            <div className="mb-6">
+              <div className="flex items-center gap-3 mb-2">
+                <Award className="h-6 w-6 text-accent" />
+                <h2 className="font-serif text-2xl font-bold text-primary">
+                  Student Achievements
+                </h2>
+              </div>
+              <p className="text-muted-foreground">
+                Share student accomplishments and milestones
+              </p>
+            </div>
+
+            <div className="space-y-6">
+              <div>
+                <Label htmlFor="studentName">Student Name</Label>
+                <Input
+                  id="studentName"
+                  name="studentName"
+                  value={achievementData.studentName}
+                  onChange={handleAchievementChange}
+                  placeholder="Enter student name"
+                  className="mt-2"
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="achievement">Achievement Details</Label>
+                <Textarea
+                  id="achievement"
+                  name="achievement"
+                  value={achievementData.achievement}
+                  onChange={handleAchievementChange}
+                  placeholder="Describe the achievement..."
+                  className="mt-2 min-h-[120px]"
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="achievementImage">Achievement Image (Optional)</Label>
+                <div className="mt-2">
+                  {achievementImage ? (
+                    <div className="relative aspect-video rounded-lg overflow-hidden border-2 border-dashed border-border">
+                      <img
+                        src={achievementImage}
+                        alt="Achievement preview"
+                        className="w-full h-full object-cover"
+                      />
+                      <Button
+                        type="button"
+                        variant="destructive"
+                        size="sm"
+                        className="absolute top-2 right-2"
+                        onClick={() => setAchievementImage(null)}
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  ) : (
+                    <label
+                      htmlFor="achievementImage"
+                      className="flex flex-col items-center justify-center aspect-video rounded-lg border-2 border-dashed border-border hover:border-accent cursor-pointer transition-colors bg-muted/30"
+                    >
+                      <ImagePlus className="h-10 w-10 text-muted-foreground mb-2" />
+                      <span className="text-sm text-muted-foreground">
+                        Click to upload achievement image
+                      </span>
+                      <input
+                        id="achievementImage"
+                        type="file"
+                        accept="image/*"
+                        onChange={handleAchievementImageChange}
+                        className="hidden"
+                      />
+                    </label>
+                  )}
+                </div>
+              </div>
+
+              <Button 
+                type="button" 
+                onClick={handleAchievementSubmit}
+                className="w-full"
+                size="lg"
+              >
+                Add Achievement
+              </Button>
+            </div>
+          </div>
         </div>
       </main>
 
