@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import BlogCard from "@/components/BlogCard";
@@ -12,13 +13,15 @@ import { getBlogPosts, getGallerySections, addImageToSection, removeImageFromSec
 import type { BlogPost } from "@/utils/storage";
 
 const Index = () => {
+  const location = useLocation();
   const [blogPosts, setBlogPosts] = useState<BlogPost[]>([]);
   const [gallerySections, setGallerySections] = useState<GallerySection[]>([]);
 
   useEffect(() => {
+    // Refresh blog posts and gallery whenever the route changes
     setBlogPosts(getBlogPosts());
     setGallerySections(getGallerySections());
-  }, []);
+  }, [location]);
 
   const handleImageAdd = (sectionId: string, image: { src: string; alt: string; caption: string }) => {
     addImageToSection(sectionId, image);
